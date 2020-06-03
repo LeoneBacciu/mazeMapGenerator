@@ -10,6 +10,8 @@ public class Cell {
     private boolean checkpoint;
     private boolean victim;
 
+    private String ramp;
+
     public Cell(){
         walls = new int[4];
         Arrays.fill(walls, 0);
@@ -17,6 +19,7 @@ public class Cell {
         this.black = false;
         this.checkpoint = false;
         this.victim = false;
+        this.ramp = "";
     }
 
     public String getStyle(){
@@ -65,5 +68,29 @@ public class Cell {
 
     public void setVictim(boolean victim) {
         this.victim = victim;
+    }
+
+    public void setRamp(String ramp) {
+        this.ramp = ramp;
+    }
+
+    public String getRamp() {
+        return this.ramp;
+    }
+
+    public boolean isExplored() {
+        return explored;
+    }
+
+    public boolean isBlack() {
+        return black;
+    }
+
+    public boolean isCheckpoint() {
+        return checkpoint;
+    }
+
+    public boolean isVictim() {
+        return victim;
     }
 }

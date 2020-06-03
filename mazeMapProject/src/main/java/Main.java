@@ -8,7 +8,7 @@ public class Main extends Application {
         launch(args);
     }
     public void start(Stage primaryStage) {
-        Scene scene = new Scene(new MatrixView());
+        Scene scene = new Scene(new MatrixView(new int[]{10, 2}));
         primaryStage.setTitle("Maze");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);

@@ -1,40 +1,53 @@
 package windows.buttonView.components;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import windows.matrixView.matrix.Cell;
+import windows.matrixView.matrix.Ramps;
 
 public class CenterView extends VBox {
     private final CenterViewChildren exploredBox;
     private final CenterViewChildren blackBox;
     private final CenterViewChildren checkpointBox;
     private final CenterViewChildren victimBox;
+    private final CenterViewChildren rampBox;
+    private final Cell cell;
 
-    public CenterView(){
-        exploredBox = new CenterViewChildren("Cella esplorata", new String[]{
-                "Si", "No"
-        });
-        blackBox = new CenterViewChildren("Cella nera", new String[]{
-                "Si", "No"
-        });
-        checkpointBox = new CenterViewChildren("Cella checkpoint", new String[]{
-                "Si", "No"
-        });
-        victimBox = new CenterViewChildren("Cella vittima", new String[]{
-                "Si", "No"
-        });
+    public CenterView(Cell cell){
+        this.cell = cell;
+        String[] yesNo = new String[]{"Si", "No"};
+
+        exploredBox = new CenterViewChildren("Cella esplorata", yesNo[cell.isExplored()?0:1], yesNo);
+        blackBox = new CenterViewChildren("Cella nera", yesNo[cell.isBlack()?0:1], yesNo);
+        checkpointBox = new CenterViewChildren("Cella checkpoint", yesNo[cell.isCheckpoint()?0:1], yesNo);
+        victimBox = new CenterViewChildren("Cella vittima", yesNo[cell.isVictim()?0:1], yesNo);
+
+        rampBox = new CenterViewChildren("Rampa", cell.getRamp(), Ramps.getAvailable());
 
         getChildren().addAll(
                 exploredBox,
                 blackBox,
                 checkpointBox,
-                victimBox
+                victimBox,
+                rampBox
         );
+    }
 
-        //setSpacing(20.0);
+    void save(){
+        cell.setExplored(getExploredBox().getCurrent().equals("Si"));
+        cell.setBlack(getBlackBox().getCurrent().equals("Si"));
+        cell.setCheckpoint(getCheckpointBox().getCurrent().equals("Si"));
+        cell.setVictim(getVictimBox().getCurrent().equals("Si"));
+
+        String prev = cell.getRamp();
+        cell.setRamp(getRampBox().getCurrent());
+        if(!prev.equals("")) Ramps.reverse(prev);
+        if(!prev.equals(cell.getRamp()))Ramps.selected(cell.getRamp());
     }
 
     public CenterViewChildren getExploredBox() {
@@ -52,20 +65,36 @@ public class CenterView extends VBox {
     public CenterViewChildren getVictimBox() {
         return victimBox;
     }
+
+    public CenterViewChildren getRampBox() {
+        return rampBox;
+    }
 }
 
 class CenterViewChildren extends HBox{
     private String current;
 
-    public CenterViewChildren(String text, String[] choices){
-        current = "";
-        getChildren().add(new Label(text));
+    public CenterViewChildren(String text, String def, String[] choices){
+        current = def;
 
+        if(!def.equals("") && choices.length == 1 && !choices[0].equals(def))
+            choices = new String[]{"A", "B"};
+
+        if(!def.equals("") && choices.length == 0)
+            choices = new String[]{def};
+
+        getChildren().add(new Label(text));
         ChoiceBox<String> box = new ChoiceBox<>();
-        //box.setValue("Si");
-        box.setItems(FXCollections.observableArrayList(choices));
+        ObservableList<String> observableArray = FXCollections.observableArrayList(choices);
+        observableArray.add(0, "");
+        box.setItems(observableArray);
+        box.setValue(current);
         box.getSelectionModel().selectedIndexProperty().addListener(
-                (observable, oldValue, newValue) -> current = choices[newValue.intValue()]
+                (observable, oldValue, newValue) -> {
+                    current = observableArray.get(newValue.intValue());
+                    CenterView parent = (CenterView) getParent();
+                    parent.save();
+                }
         );
         getChildren().add(box);
 

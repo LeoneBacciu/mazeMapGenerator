@@ -9,8 +9,7 @@ import windows.matrixView.matrix.Cell;
 
 public class MatrixCell extends GridPane {
     private final Cell cell;
-    private final MainPane matrixPane;
-    private Stage settingsStage;
+    private final MatrixPane matrixPane;
     private final int[][] pairs = new int[][]{
         {1, 0},
         {0, -1},
@@ -18,17 +17,9 @@ public class MatrixCell extends GridPane {
         {0, 1}
     };
 
-    public MatrixCell(Cell cell, MainPane matrixPane){
+    public MatrixCell(Cell cell, MatrixPane matrixPane){
         this.cell = cell;
         this.matrixPane = matrixPane;
-
-        ButtonView buttonView = new ButtonView(cell);
-        settingsStage = new Stage();
-        Scene scene = new Scene(buttonView, 600, 400);
-        settingsStage.setTitle("Cell\tx: " + cell.getCoord()[0] +
-                " y: " + cell.getCoord()[1]);
-        settingsStage.setResizable(false);
-        settingsStage.setScene(scene);
 
         setMaxHeight(Double.MAX_VALUE);
         setMaxWidth(Double.MAX_VALUE);
@@ -57,7 +48,14 @@ public class MatrixCell extends GridPane {
     }
 
     private void showDialog(){
-        this.settingsStage.show();
+        ButtonView buttonView = new ButtonView(cell);
+        Stage settingsStage = new Stage();
+        Scene scene = new Scene(buttonView, 500, 300);
+        settingsStage.setTitle("Cell\tx: " + cell.getCoord()[0] +
+                " y: " + cell.getCoord()[1]);
+        settingsStage.setResizable(false);
+        settingsStage.setScene(scene);
+        settingsStage.show();
     }
 
     public void updateStyle(){

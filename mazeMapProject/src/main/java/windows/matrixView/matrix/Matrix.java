@@ -1,17 +1,12 @@
 package windows.matrixView.matrix;
 
-import com.google.gson.Gson;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Matrix {
-    private int size;
-    private Cell[][] matrix;
+    private final int size;
+    private final Cell[][] matrix;
 
     public Matrix(int size){
         this.size = size;
@@ -28,20 +23,11 @@ public class Matrix {
         return matrix;
     }
 
-    public void save(File path){
-        Gson gson = new Gson();
+    public List<Cell> toList(){
         List<Cell> cells = new ArrayList<>();
-
         for (int y = 0; y < size; y++) {
             cells.addAll(Arrays.asList(matrix[y]).subList(0, size));
         }
-
-        try(FileWriter fr = new FileWriter(path.getAbsolutePath() +
-                "/mazeMap.json")){
-            gson.toJson(cells, fr);
-        } catch (IOException exception){
-            //skip
-            exception.printStackTrace();
-        }
+        return cells;
     }
 }

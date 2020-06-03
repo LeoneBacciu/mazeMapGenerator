@@ -4,11 +4,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import windows.matrixView.matrix.Matrix;
 
-public class MainPane extends GridPane {
+public class MatrixPane extends GridPane {
     private final Matrix matrix;
     private final MatrixCell[][] buttons;
 
-    public MainPane(int size){
+    public MatrixPane(int size){
         matrix = new Matrix(size);
         buttons = new MatrixCell[size][size];
 

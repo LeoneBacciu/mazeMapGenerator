@@ -1,18 +1,22 @@
 package windows.matrixView.components;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import com.google.gson.Gson;
+import javafx.event.ActionEvent;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
-import windows.matrixView.matrix.Matrix;
+import windows.matrixView.matrix.Cell;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TopBar extends MenuBar {
 
-    public TopBar(Matrix matrix){
+    public TopBar(TabPane tabPane, int[] size){
         Menu file = new Menu("File");
         MenuItem save = new MenuItem("Save");
         MenuItem exit = new MenuItem("Exit");
@@ -20,15 +24,34 @@ public class TopBar extends MenuBar {
         save.setOnAction(event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             File selectedPath = directoryChooser.showDialog(
-                    (Stage) getScene().getWindow()
+                    getScene().getWindow()
             );
-            matrix.save(selectedPath);
+
+            List<List<Cell>> matrices = new ArrayList<>();
+            for(Tab tab: tabPane.getTabs()){
+                MatrixPane matrixPane = (MatrixPane) tab.getContent();
+                matrices.add(matrixPane.getMatrix().toList());
+            }
+
+            Map<String, Object> json = new HashMap<>();
+            json.put("dims", new int[]{size[0], tabPane.getTabs().size()});
+            json.put("levels", matrices);
+            this.save(selectedPath, json);
         });
 
-        exit.setOnAction(event -> {
-            System.exit(0);
-        });
+        exit.setOnAction((ActionEvent event) -> System.exit(0));
         file.getItems().addAll(save, exit);
         getMenus().add(file);
+    }
+
+    private void save(File path, Map<String, Object> objectMap){
+        Gson gson = new Gson();
+
+        try(FileWriter fr = new FileWriter(path.getAbsolutePath() +
+                "/mazeMap.json")){
+            gson.toJson(objectMap, fr);
+        } catch (IOException exception){
+            exception.printStackTrace();
+        }
     }
 }
