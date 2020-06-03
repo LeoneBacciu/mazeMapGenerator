@@ -4,6 +4,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import windows.matrixView.components.MatrixButton;
+import windows.matrixView.components.MainPane;
 import windows.matrixView.components.MatrixPane;
 import windows.matrixView.matrix.Cell;
 

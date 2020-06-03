@@ -50,6 +50,10 @@ public class Cell {
         this.walls[3] = b ? 1 : 0;
     }
 
+    public void invertWall(int wall){
+        this.walls[wall]=(this.walls[wall]==1)?0:1;
+    }
+
     public int[] getCoord() {
         return coord;
     }

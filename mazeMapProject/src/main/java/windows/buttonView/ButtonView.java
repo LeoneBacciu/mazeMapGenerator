@@ -4,6 +4,7 @@ import javafx.scene.layout.BorderPane;
 import windows.buttonView.components.BottomButtonBar;
 import windows.buttonView.components.CenterView;
 import windows.matrixView.components.MatrixButton;
+import windows.matrixView.components.MainPane;
 import windows.matrixView.components.MatrixPane;
 import windows.matrixView.matrix.Cell;
 
