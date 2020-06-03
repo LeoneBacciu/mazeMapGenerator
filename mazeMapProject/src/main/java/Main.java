@@ -7,8 +7,8 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(new MatrixView(), 800, 800);
+    public void start(Stage primaryStage) {
+        Scene scene = new Scene(new MatrixView());
         primaryStage.setTitle("Maze");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);

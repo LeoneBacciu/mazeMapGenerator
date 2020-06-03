@@ -7,24 +7,29 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Matrix extends ArrayList<ArrayList<Cell>> {
+public class Matrix {
     private int size;
+    private Cell[][] matrix;
 
     public Matrix(int size){
         this.size = size;
-        for (int i = 0; i < size; i++)
-            this.add(new ArrayList<>());
+        this.matrix = new Cell[size][size];
 
-        for(ArrayList<Cell> cell : this){
-            for(int i = 0; i < size; i++)
-                cell.add(new Cell());
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                this.matrix[y][x] = new Cell();
+            }
         }
+    }
+
+    public Cell[][] getMatrix() {
+        return matrix;
     }
 
     public void save(File path){
         Gson gson = new Gson();
         try{
-            gson.toJson(this, new FileWriter(path.getAbsolutePath() +
+            gson.toJson(this.matrix, new FileWriter(path.getAbsolutePath() +
                     "/mazeMap.json"));
         } catch (IOException exception){
             //skip

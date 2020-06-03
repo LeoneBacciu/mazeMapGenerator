@@ -20,17 +20,19 @@ public class Cell {
     }
 
     public String getStyle(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("-fx-background-color:transparent ;\n" +
+        return "-fx-background-color:transparent ;\n" +
                 "    -fx-background-radius:0;\n" +
-                "    -fx-border-color: #92a8d1;\n" +
-                "    -fx-border-width: ");
-        stringBuilder.append(walls[1]).append(" ");
-        stringBuilder.append(walls[0]).append(" ");
-        stringBuilder.append(walls[3]).append(" ");
-        stringBuilder.append(walls[2]).append(" ");
-        stringBuilder.append(";");
-        return stringBuilder.toString();
+                "    -fx-border-width: 2.5;\n" +
+                "    -fx-border-color: " +
+                getColor(walls[1]) +
+                getColor(walls[0]) +
+                getColor(walls[3]) +
+                getColor(walls[2]) +
+                ";";
+    }
+
+    private String getColor(int wall){
+        return (wall==1)?"#92a8d1 ":"transparent ";
     }
 
     public int[] getWalls() {
