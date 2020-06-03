@@ -39,19 +39,6 @@ public class Cell {
         return walls;
     }
 
-    public void setRightWall(boolean b){
-        this.walls[0] = b ? 1 : 0;
-    }
-    public void setTopWall(boolean b){
-        this.walls[1] = b ? 1 : 0;
-    }
-    public void setLeftWall(boolean b){
-        this.walls[2] = b ? 1 : 0;
-    }
-    public void setBottomWall(boolean b){
-        this.walls[3] = b ? 1 : 0;
-    }
-
     public void invertWall(int wall){
         this.walls[wall]=(this.walls[wall]==1)?0:1;
     }
@@ -64,32 +51,16 @@ public class Cell {
         this.coord = coord;
     }
 
-    public boolean isExplored() {
-        return explored;
-    }
-
     public void setExplored(boolean explored) {
         this.explored = explored;
-    }
-
-    public boolean isBlack() {
-        return black;
     }
 
     public void setBlack(boolean black) {
         this.black = black;
     }
 
-    public boolean isCheckpoint() {
-        return checkpoint;
-    }
-
     public void setCheckpoint(boolean checkpoint) {
         this.checkpoint = checkpoint;
-    }
-
-    public boolean isVictim() {
-        return victim;
     }
 
     public void setVictim(boolean victim) {
