@@ -34,8 +34,8 @@ public class TopBar extends MenuBar {
             }
 
             Map<String, Object> json = new HashMap<>();
-            json.put("dims", new int[]{size[0], tabPane.getTabs().size()});
-            json.put("levels", matrices);
+            json.put("header", new int[]{size[0], tabPane.getTabs().size()});
+            json.put("body", matrices);
             this.save(selectedPath, json);
         });
 

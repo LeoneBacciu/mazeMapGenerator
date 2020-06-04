@@ -1,15 +1,17 @@
 package windows.matrixView.components;
 
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import windows.buttonView.ButtonView;
 import windows.matrixView.matrix.Cell;
 
-public class MatrixCell extends GridPane {
+public class MatrixCell extends BorderPane {
     private final Cell cell;
     private final MatrixPane matrixPane;
+    private final Button settingsButton;
     private final int[][] pairs = new int[][]{
         {1, 0},
         {0, -1},
@@ -23,17 +25,20 @@ public class MatrixCell extends GridPane {
 
         setMaxHeight(Double.MAX_VALUE);
         setMaxWidth(Double.MAX_VALUE);
-        Button text = new Button("\u2699");
-        text.setOnAction(e -> showDialog());
-        add(text, 1, 1);
-        int[][] wallButtons = new int[][]{{2, 1, 8594}, {1, 0, 8593}, {0, 1, 8592}, {1, 2, 8595}};
-        for (int i = 0; i < wallButtons.length; i++) {
-            int[] pair = wallButtons[i];
-            Button tmpButton = new Button(String.valueOf((char) pair[2]));
-            int finalI = i;
-            tmpButton.setOnAction(e -> setCellWalls(finalI));
-            add(tmpButton, pair[0], pair[1]);
-        }
+        settingsButton = new Button("\u2699");
+        settingsButton.setOnAction(e -> showDialog());
+        setCenter(settingsButton);
+        setRight(buildButton(8594, 0));
+        setTop(buildButton(8593, 1));
+        setLeft(buildButton(8592, 2));
+        setBottom(buildButton(8595, 3));
+    }
+
+    private Button buildButton(int arrow, int wall){
+        Button tmpButton = new Button(String.valueOf((char) arrow));
+        tmpButton.setOnAction(e -> setCellWalls(wall));
+        setAlignment(tmpButton, Pos.CENTER);
+        return tmpButton;
     }
 
     private void setCellWalls(int wall){
@@ -48,7 +53,7 @@ public class MatrixCell extends GridPane {
     }
 
     private void showDialog(){
-        ButtonView buttonView = new ButtonView(cell);
+        ButtonView buttonView = new ButtonView(this);
         Stage settingsStage = new Stage();
         Scene scene = new Scene(buttonView, 500, 300);
         settingsStage.setTitle("Cell\tx: " + cell.getCoord()[0] +
@@ -60,6 +65,8 @@ public class MatrixCell extends GridPane {
 
     public void updateStyle(){
         setStyle(cell.getStyle());
+        settingsButton.setText((cell.getRamp().equals(""))?"\u2699":cell.getRamp());
+        settingsButton.setStyle("-fx-background-color: " + ((cell.hasVictim())?"#c14e4e":"transparent") + ";");
     }
 
     private int mirrorWall(int i){
@@ -77,4 +84,7 @@ public class MatrixCell extends GridPane {
         }
     }
 
+    public Cell getCell() {
+        return cell;
+    }
 }

@@ -23,8 +23,9 @@ public class Cell {
     }
 
     public String getStyle(){
-        return "-fx-background-color:transparent ;\n" +
-                "    -fx-background-radius:0;\n" +
+        return "-fx-background-color: " +
+                getBackgroundColor() +
+                "    ;\n-fx-background-radius:0;\n" +
                 "    -fx-border-width: 2.5;\n" +
                 "    -fx-border-color: " +
                 getColor(walls[1]) +
@@ -32,6 +33,12 @@ public class Cell {
                 getColor(walls[3]) +
                 getColor(walls[2]) +
                 ";";
+    }
+
+    private String getBackgroundColor(){
+        if (isBlack()) return "#000000";
+        if (isCheckpoint()) return "#C0C0C0";
+        return "transparent";
     }
 
     private String getColor(int wall){
@@ -90,7 +97,7 @@ public class Cell {
         return checkpoint;
     }
 
-    public boolean isVictim() {
+    public boolean hasVictim() {
         return victim;
     }
 }

@@ -7,6 +7,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import windows.matrixView.components.MatrixCell;
 import windows.matrixView.matrix.Cell;
 import windows.matrixView.matrix.Ramps;
 
@@ -17,15 +18,17 @@ public class CenterView extends VBox {
     private final CenterViewChildren victimBox;
     private final CenterViewChildren rampBox;
     private final Cell cell;
+    private final MatrixCell matrixCell;
 
-    public CenterView(Cell cell){
-        this.cell = cell;
+    public CenterView(MatrixCell matrixCell){
+        this.matrixCell = matrixCell;
+        this.cell = matrixCell.getCell();
         String[] yesNo = new String[]{"Si", "No"};
 
         exploredBox = new CenterViewChildren("Cella esplorata", yesNo[cell.isExplored()?0:1], yesNo);
         blackBox = new CenterViewChildren("Cella nera", yesNo[cell.isBlack()?0:1], yesNo);
         checkpointBox = new CenterViewChildren("Cella checkpoint", yesNo[cell.isCheckpoint()?0:1], yesNo);
-        victimBox = new CenterViewChildren("Cella vittima", yesNo[cell.isVictim()?0:1], yesNo);
+        victimBox = new CenterViewChildren("Cella vittima", yesNo[cell.hasVictim()?0:1], yesNo);
 
         rampBox = new CenterViewChildren("Rampa", cell.getRamp(), Ramps.getAvailable());
 
@@ -48,6 +51,7 @@ public class CenterView extends VBox {
         cell.setRamp(getRampBox().getCurrent());
         if(!prev.equals("")) Ramps.reverse(prev);
         if(!prev.equals(cell.getRamp()))Ramps.selected(cell.getRamp());
+        matrixCell.updateStyle();
     }
 
     public CenterViewChildren getExploredBox() {
