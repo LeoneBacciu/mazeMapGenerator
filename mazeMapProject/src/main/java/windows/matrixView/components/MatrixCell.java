@@ -66,7 +66,7 @@ public class MatrixCell extends BorderPane {
     public void updateStyle(){
         setStyle(cell.getStyle());
         settingsButton.setText((cell.getRamp().equals(""))?"\u2699":cell.getRamp());
-        settingsButton.setStyle("-fx-background-color: " + ((cell.hasVictim())?"#c14e4e":"transparent") + ";");
+        settingsButton.setStyle("-fx-background-color: " + ((cell.hasVictim())?"#c14e4e":"white") + ";");
     }
 
     private int mirrorWall(int i){

@@ -28,7 +28,7 @@ public class TopBar extends MenuBar {
             );
 
             List<List<Cell>> matrices = new ArrayList<>();
-            for(Tab tab: tabPane.getTabs()){
+            for(Tab tab: tabPane.getTabs().subList(0, tabPane.getTabs().size()-1)){
                 MatrixPane matrixPane = (MatrixPane) tab.getContent();
                 matrices.add(matrixPane.getMatrix().toList());
             }
