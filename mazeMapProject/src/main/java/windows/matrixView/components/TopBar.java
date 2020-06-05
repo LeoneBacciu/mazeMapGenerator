@@ -3,7 +3,7 @@ package windows.matrixView.components;
 import com.google.gson.Gson;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
-import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import windows.matrixView.matrix.Cell;
 
 import java.io.File;
@@ -22,8 +22,10 @@ public class TopBar extends MenuBar {
         MenuItem exit = new MenuItem("Exit");
 
         save.setOnAction(event -> {
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            File selectedPath = directoryChooser.showDialog(
+            FileChooser fileChooser = new FileChooser();
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json");
+            fileChooser.getExtensionFilters().add(extFilter);
+            File selectedPath = fileChooser.showSaveDialog(
                     getScene().getWindow()
             );
 
@@ -46,9 +48,7 @@ public class TopBar extends MenuBar {
 
     private void save(File path, Map<String, Object> objectMap){
         Gson gson = new Gson();
-
-        try(FileWriter fr = new FileWriter(path.getAbsolutePath() +
-                "/mazeMap.json")){
+        try(FileWriter fr = new FileWriter(path.getAbsolutePath())){
             gson.toJson(objectMap, fr);
         } catch (IOException exception){
             exception.printStackTrace();
