@@ -7,6 +7,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import windows.matrixView.SavedState;
 import windows.matrixView.components.MatrixCell;
 import windows.matrixView.matrix.Cell;
 import windows.matrixView.matrix.Ramps;
@@ -42,17 +43,24 @@ public class CenterView extends VBox {
     }
 
     void save(){
-        cell.setExplored(getExploredBox().getCurrent().equals("Si"));
-        cell.setBlack(getBlackBox().getCurrent().equals("Si"));
-        cell.setCheckpoint(getCheckpointBox().getCurrent().equals("Si"));
-        cell.setVictim(getVictimBox().getCurrent().equals("Si"));
+        boolean changed;
+        changed = cell.setExplored(getExploredBox().getCurrent().equals("Si"));
+        changed ^= cell.setBlack(getBlackBox().getCurrent().equals("Si"));
+        changed ^= cell.setCheckpoint(getCheckpointBox().getCurrent().equals("Si"));
+        changed ^= cell.setVictim(getVictimBox().getCurrent().equals("Si"));
+        if (changed) SavedState.setSaved(false);
 
         String prev = cell.getRamp();
         cell.setRamp(getRampBox().getCurrent());
         if(!prev.equals("")) Ramps.reverse(prev);
-        if(!prev.equals(cell.getRamp()))Ramps.selected(cell.getRamp());
+        if(!prev.equals(cell.getRamp())) {
+            Ramps.selected(cell.getRamp());
+            SavedState.setSaved(false);
+        }
         matrixCell.updateStyle();
     }
+
+
 
     public CenterViewChildren getExploredBox() {
         return exploredBox;

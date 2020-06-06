@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import windows.buttonView.ButtonView;
+import windows.matrixView.SavedState;
 import windows.matrixView.matrix.Cell;
 
 public class MatrixCell extends BorderPane {
@@ -22,7 +23,6 @@ public class MatrixCell extends BorderPane {
     public MatrixCell(Cell cell, MatrixPane matrixPane){
         this.cell = cell;
         this.matrixPane = matrixPane;
-
         setMaxHeight(Double.MAX_VALUE);
         setMaxWidth(Double.MAX_VALUE);
         settingsButton = new Button("\u2699");
@@ -36,20 +36,21 @@ public class MatrixCell extends BorderPane {
 
     private Button buildButton(int arrow, int wall){
         Button tmpButton = new Button(String.valueOf((char) arrow));
-        tmpButton.setOnAction(e -> setCellWalls(wall));
+        tmpButton.setOnAction(e -> invertCellWall(wall));
         setAlignment(tmpButton, Pos.CENTER);
         return tmpButton;
     }
 
-    private void setCellWalls(int wall){
+    private void invertCellWall(int wall){
         this.cell.invertWall(wall);
         try {
             int newX = pairs[wall][1]+cell.getCoord()[1], newY = pairs[wall][0]+cell.getCoord()[0];
             Cell c = matrixPane.getMatrix().getMatrix()[newY][newX];
             c.getWalls()[mirrorWall(wall)] = cell.getWalls()[wall];
-            matrixPane.getButtons()[newY][newX].updateStyle();
+            matrixPane.getCells()[newY][newX].updateStyle();
         }catch (IndexOutOfBoundsException ignored){}
         setStyle(cell.getStyle());
+        SavedState.setSaved(false);
     }
 
     private void showDialog(){

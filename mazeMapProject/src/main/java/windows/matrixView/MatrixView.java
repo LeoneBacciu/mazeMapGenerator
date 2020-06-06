@@ -18,27 +18,28 @@ public class MatrixView extends BorderPane {
             tabPane.getTabs().add(tmpTab);
         }
 
-        AddTab addTab = new AddTab();
-        tabPane.getTabs().add(addTab);
-        tabPane.getSelectionModel().selectedIndexProperty().addListener((ov, oldValue, newValue) -> {
-            int tabSize = tabPane.getTabs().size();
-            if(newValue.intValue()==tabSize-1){
-                tabPane.getSelectionModel().select(oldValue.intValue());
-                Tab tmpTab = new Tab();
-                tmpTab.setText("Level "+(tabSize-1));
-                tmpTab.setContent(new MatrixPane(size[0]));
-                tabPane.getTabs().add(tabSize-1, tmpTab);
-            }
-        });
         TopBar topBar = new TopBar(tabPane, size);
+        AddTab addTab = new AddTab(size[0], tabPane, topBar);
+
         setCenter(tabPane);
         setTop(topBar);
     }
 }
 
 class AddTab extends Tab{
-    public AddTab(){
+    public AddTab(int size, TabPane tabPane, TopBar topBar){
         setClosable(false);
         setText("+");
+        tabPane.getTabs().add(this);
+        tabPane.getSelectionModel().selectedIndexProperty().addListener((ov, oldValue, newValue) -> {
+            int tabSize = tabPane.getTabs().size();
+            if(!topBar.isLoading() && newValue.intValue()==tabSize-1){
+                tabPane.getSelectionModel().select(oldValue.intValue());
+                Tab tmpTab = new Tab();
+                tmpTab.setText("Level "+(tabSize-1));
+                tmpTab.setContent(new MatrixPane(size));
+                tabPane.getTabs().add(tabSize-1, tmpTab);
+            }
+        });
     }
 }

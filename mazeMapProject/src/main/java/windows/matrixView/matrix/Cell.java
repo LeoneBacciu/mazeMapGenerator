@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Cell {
     private int[] coord;
-    private int[] walls;
+    private final int[] walls;
     private boolean explored;
     private boolean black;
     private boolean checkpoint;
@@ -12,14 +12,25 @@ public class Cell {
 
     private String ramp;
 
-    public Cell(){
-        walls = new int[4];
+    public Cell(int[] coord){
+        this.coord = coord;
+        this.walls = new int[4];
         Arrays.fill(walls, 0);
         this.explored = false;
         this.black = false;
         this.checkpoint = false;
         this.victim = false;
         this.ramp = "";
+    }
+
+    public Cell(int[] coord, int[] walls, boolean explored, boolean black, boolean checkpoint, boolean victim, String ramp){
+        this.coord = coord;
+        this.walls = walls;
+        this.explored = explored;
+        this.black = black;
+        this.checkpoint = checkpoint;
+        this.victim = victim;
+        this.ramp = ramp;
     }
 
     public String getStyle(){
@@ -61,20 +72,28 @@ public class Cell {
         this.coord = coord;
     }
 
-    public void setExplored(boolean explored) {
+    public boolean setExplored(boolean explored) {
+        boolean ret = explored != isExplored();
         this.explored = explored;
+        return ret;
     }
 
-    public void setBlack(boolean black) {
+    public boolean setBlack(boolean black) {
+        boolean ret = black != isBlack();
         this.black = black;
+        return ret;
     }
 
-    public void setCheckpoint(boolean checkpoint) {
+    public boolean setCheckpoint(boolean checkpoint) {
+        boolean ret = checkpoint != isCheckpoint();
         this.checkpoint = checkpoint;
+        return ret;
     }
 
-    public void setVictim(boolean victim) {
+    public boolean setVictim(boolean victim) {
+        boolean ret = victim != hasVictim();
         this.victim = victim;
+        return ret;
     }
 
     public void setRamp(String ramp) {
@@ -100,4 +119,5 @@ public class Cell {
     public boolean hasVictim() {
         return victim;
     }
+
 }
