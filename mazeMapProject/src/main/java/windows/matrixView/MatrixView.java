@@ -15,6 +15,7 @@ public class MatrixView extends BorderPane {
             Tab tmpTab = new Tab();
             tmpTab.setText("Level "+i);
             tmpTab.setContent(new MatrixPane(size[0], i));
+            // TODO: add close tab if last or reopen
             if (i==0) tmpTab.setClosable(false);
             tabPane.getTabs().add(tmpTab);
         }

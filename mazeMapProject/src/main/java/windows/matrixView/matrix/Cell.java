@@ -1,13 +1,11 @@
 package windows.matrixView.matrix;
 
-import org.omg.PortableServer.THREAD_POLICY_ID;
-
 import java.util.Arrays;
+import java.util.List;
 
 public class Cell {
     private int[] coord;
     private final int[] walls;
-    private boolean explored;
     private boolean black;
     private boolean checkpoint;
     private boolean victim;
@@ -18,22 +16,23 @@ public class Cell {
         this.coord = coord;
         this.walls = new int[4];
         Arrays.fill(walls, 0);
-        this.explored = false;
         this.black = false;
         this.checkpoint = false;
         this.victim = false;
         this.ramp = "";
     }
 
-    public Cell(int[] coord, int[] walls, boolean explored, boolean black, boolean checkpoint, boolean victim, String ramp){
+    public Cell(int[] coord, int[] walls, boolean black, boolean checkpoint, boolean victim, String ramp, List<String> ramps){
         this.coord = coord;
         this.walls = walls;
-        this.explored = explored;
         this.black = black;
         this.checkpoint = checkpoint;
         this.victim = victim;
         this.ramp = ramp;
-        if(!this.ramp.equals("")) Ramps.selected(this.ramp);
+        if(!this.ramp.equals("")){
+            Ramps.selected(this.ramp);
+            ramps.add(this.ramp);
+        }
     }
 
     public String getStyle(){
@@ -75,12 +74,6 @@ public class Cell {
         this.coord = coord;
     }
 
-    public boolean setExplored(boolean explored) {
-        boolean ret = explored != isExplored();
-        this.explored = explored;
-        return ret;
-    }
-
     public boolean setBlack(boolean black) {
         boolean ret = black != isBlack();
         this.black = black;
@@ -105,10 +98,6 @@ public class Cell {
 
     public String getRamp() {
         return this.ramp;
-    }
-
-    public boolean isExplored() {
-        return explored;
     }
 
     public boolean isBlack() {

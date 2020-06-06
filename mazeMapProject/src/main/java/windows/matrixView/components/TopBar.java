@@ -1,11 +1,13 @@
 package windows.matrixView.components;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import windows.utils.FileManager;
+import windows.utils.SavedState;
 
 
 public class TopBar extends MenuBar {
@@ -27,7 +29,13 @@ public class TopBar extends MenuBar {
     }
 
     private void exit(TabPane tabPane, int size){
-        ExitAlert exitAlert = new ExitAlert(tabPane, size);
-        exitAlert.launch();
+        if (!SavedState.isSaved()){
+            ExitAlert exitAlert = new ExitAlert(tabPane, size);
+            exitAlert.launch();
+        }else {
+            Platform.exit();
+            System.exit(0);
+        }
+
     }
 }

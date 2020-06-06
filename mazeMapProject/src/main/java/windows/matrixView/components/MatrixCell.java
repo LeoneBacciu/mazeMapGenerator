@@ -3,16 +3,23 @@ package windows.matrixView.components;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import windows.buttonView.ButtonView;
+import windows.matrixView.matrix.Ramps;
 import windows.utils.SavedState;
 import windows.matrixView.matrix.Cell;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MatrixCell extends BorderPane {
     private final Cell cell;
     private final MatrixPane matrixPane;
     private final Button settingsButton;
+    private long clickStartTime;
     private final int[][] pairs = new int[][]{
         {1, 0},
         {0, -1},
@@ -26,7 +33,7 @@ public class MatrixCell extends BorderPane {
         setMaxHeight(Double.MAX_VALUE);
         setMaxWidth(Double.MAX_VALUE);
         settingsButton = new Button("\u2699");
-        settingsButton.setOnAction(e -> showDialog());
+        settingsButton.addEventFilter(MouseEvent.ANY, this::settings);
         setCenter(settingsButton);
         setRight(buildButton(8594, 0));
         setTop(buildButton(8593, 1));
@@ -39,6 +46,41 @@ public class MatrixCell extends BorderPane {
         tmpButton.setOnAction(e -> invertCellWall(wall));
         setAlignment(tmpButton, Pos.CENTER);
         return tmpButton;
+    }
+
+    private void settings(MouseEvent e){
+        if (e.getButton() == MouseButton.PRIMARY) {
+            if (e.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+                clickStartTime = System.currentTimeMillis();
+            } else if (e.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
+                if (System.currentTimeMillis() - clickStartTime > 300) {
+                    cell.setVictim(!cell.hasVictim());
+                } else {
+                    System.out.println("Pressed for " + (System.currentTimeMillis() - clickStartTime) + " milliseconds");
+                    if (cell.isBlack()){
+                        cell.setBlack(false);
+                        cell.setCheckpoint(true);
+                    }else if (cell.isCheckpoint()){
+                        cell.setCheckpoint(false);
+                    }else {
+                        cell.setBlack(true);
+                    }
+                }
+                updateStyle();
+            }
+        }else if (e.getEventType().equals(MouseEvent.MOUSE_CLICKED) && e.getButton() == MouseButton.SECONDARY){
+            List<String> ramps = Arrays.asList(Ramps.getAvailable(cell.getRamp(), matrixPane.getMatrix().getRamps()));
+            int index = ramps.indexOf(cell.getRamp());
+            Ramps.reverse(ramps.get(index));
+            matrixPane.getMatrix().getRamps().remove(ramps.get(index));
+            if (index==ramps.size()-1) index=0;
+            else index+=1;
+            cell.setRamp(ramps.get(index));
+            Ramps.selected(cell.getRamp());
+            matrixPane.getMatrix().getRamps().add(cell.getRamp());
+            updateStyle();
+        }
+        SavedState.setSaved(false);
     }
 
     private void invertCellWall(int wall){

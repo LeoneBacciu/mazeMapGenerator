@@ -8,11 +8,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import windows.errors.FileCorruptedException;
+import windows.errors.MismatchingRampsException;
 import windows.errors.MissingRampsException;
 import windows.errors.OpenMazeException;
 import windows.matrixView.components.MatrixPane;
 import windows.matrixView.matrix.Cell;
 import windows.matrixView.matrix.Matrix;
+import windows.matrixView.matrix.Ramps;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -104,6 +106,8 @@ public class FileManager {
         List<List<Cell>> matrices = new ArrayList<>();
         ObservableList<Tab> tabs = tabPane.getTabs();
         try {
+            String evenRamps = Ramps.evenRamps();
+            if (!evenRamps.equals("")) throw new MismatchingRampsException(evenRamps);
             for (int i = 0, tabsSize = tabs.size(); i < tabsSize-1; i++) {
                 Tab tab = tabs.get(i);
                 MatrixPane matrixPane = (MatrixPane) tab.getContent();
@@ -114,7 +118,7 @@ public class FileManager {
             json.put("header", new int[]{size, tabPane.getTabs().size()-1});
             json.put("body", matrices);
             this.saveToFile(selectedPath, json);
-        }catch (OpenMazeException | MissingRampsException e){
+        }catch (OpenMazeException | MissingRampsException | MismatchingRampsException e){
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("An error occoured while saving");

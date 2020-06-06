@@ -14,6 +14,7 @@ public class Matrix {
     private final int size;
     private final int level;
     private final Cell[][] matrix;
+    private final List<String> ramps = new ArrayList<>();
     private final int[][] pairs = new int[][]{
             {1, 0},
             {0, -1},
@@ -43,11 +44,11 @@ public class Matrix {
                 matrix[y][x] = new Cell(
                         jsonCell.coord,
                         jsonCell.walls,
-                        jsonCell.explored,
                         jsonCell.black,
                         jsonCell.checkpoint,
                         jsonCell.victim,
-                        jsonCell.ramp
+                        jsonCell.ramp,
+                        this.ramps
                 );
             }
         }catch (IndexOutOfBoundsException e){
@@ -132,5 +133,9 @@ public class Matrix {
             }
         }
         return cells;
+    }
+
+    public List<String> getRamps() {
+        return ramps;
     }
 }

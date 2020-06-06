@@ -10,61 +10,40 @@ import javafx.scene.layout.VBox;
 import windows.utils.SavedState;
 import windows.matrixView.components.MatrixCell;
 import windows.matrixView.matrix.Cell;
-import windows.matrixView.matrix.Ramps;
 
 public class CenterView extends VBox {
-    private final CenterViewChildren exploredBox;
     private final CenterViewChildren blackBox;
     private final CenterViewChildren checkpointBox;
     private final CenterViewChildren victimBox;
-    private final CenterViewChildren rampBox;
     private final Cell cell;
     private final MatrixCell matrixCell;
 
-    public CenterView(MatrixCell matrixCell){
+    public CenterView(MatrixCell matrixCell) {
         this.matrixCell = matrixCell;
         this.cell = matrixCell.getCell();
         String[] yesNo = new String[]{"Si", "No"};
 
-        exploredBox = new CenterViewChildren("Cella esplorata", yesNo[cell.isExplored()?0:1], yesNo);
-        blackBox = new CenterViewChildren("Cella nera", yesNo[cell.isBlack()?0:1], yesNo);
-        checkpointBox = new CenterViewChildren("Cella checkpoint", yesNo[cell.isCheckpoint()?0:1], yesNo);
-        victimBox = new CenterViewChildren("Cella vittima", yesNo[cell.hasVictim()?0:1], yesNo);
-
-        rampBox = new CenterViewChildren("Rampa", cell.getRamp(), Ramps.getAvailable());
+        blackBox = new CenterViewChildren("Cella nera", yesNo[cell.isBlack() ? 0 : 1], yesNo);
+        checkpointBox = new CenterViewChildren("Cella checkpoint", yesNo[cell.isCheckpoint() ? 0 : 1], yesNo);
+        victimBox = new CenterViewChildren("Cella vittima", yesNo[cell.hasVictim() ? 0 : 1], yesNo);
 
         getChildren().addAll(
-                exploredBox,
                 blackBox,
                 checkpointBox,
-                victimBox,
-                rampBox
+                victimBox
         );
     }
 
-    void save(){
+    void save() {
         boolean changed;
-        changed = cell.setExplored(getExploredBox().getCurrent().equals("Si"));
-        changed ^= cell.setBlack(getBlackBox().getCurrent().equals("Si"));
+        changed = cell.setBlack(getBlackBox().getCurrent().equals("Si"));
         changed ^= cell.setCheckpoint(getCheckpointBox().getCurrent().equals("Si"));
         changed ^= cell.setVictim(getVictimBox().getCurrent().equals("Si"));
         if (changed) SavedState.setSaved(false);
 
-        String prev = cell.getRamp();
-        cell.setRamp(getRampBox().getCurrent());
-        if(!prev.equals("")) Ramps.reverse(prev);
-        if(!prev.equals(cell.getRamp())) {
-            Ramps.selected(cell.getRamp());
-            SavedState.setSaved(false);
-        }
         matrixCell.updateStyle();
     }
 
-
-
-    public CenterViewChildren getExploredBox() {
-        return exploredBox;
-    }
 
     public CenterViewChildren getBlackBox() {
         return blackBox;
@@ -78,27 +57,17 @@ public class CenterView extends VBox {
         return victimBox;
     }
 
-    public CenterViewChildren getRampBox() {
-        return rampBox;
-    }
 }
 
-class CenterViewChildren extends HBox{
+class CenterViewChildren extends HBox {
     private String current;
 
-    public CenterViewChildren(String text, String def, String[] choices){
+    public CenterViewChildren(String text, String def, String[] choices) {
         current = def;
-
-        if(!def.equals("") && choices.length == 1 && !choices[0].equals(def))
-            choices = new String[]{"A", "B"};
-
-        if(!def.equals("") && choices.length == 0)
-            choices = new String[]{def};
 
         getChildren().add(new Label(text));
         ChoiceBox<String> box = new ChoiceBox<>();
         ObservableList<String> observableArray = FXCollections.observableArrayList(choices);
-        observableArray.add(0, "");
         box.setItems(observableArray);
         box.setValue(current);
         box.getSelectionModel().selectedIndexProperty().addListener(
