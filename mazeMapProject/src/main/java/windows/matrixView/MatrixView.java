@@ -14,7 +14,7 @@ public class MatrixView extends BorderPane {
         for (int i = 0; i < size[1]; i++) {
             Tab tmpTab = new Tab();
             tmpTab.setText("Level "+i);
-            tmpTab.setContent(new MatrixPane(size[0]));
+            tmpTab.setContent(new MatrixPane(size[0], i));
             if (i==0) tmpTab.setClosable(false);
             tabPane.getTabs().add(tmpTab);
         }
@@ -38,7 +38,7 @@ class AddTab extends Tab{
                 tabPane.getSelectionModel().select(oldValue.intValue());
                 Tab tmpTab = new Tab();
                 tmpTab.setText("Level "+(tabSize-1));
-                tmpTab.setContent(new MatrixPane(size));
+                tmpTab.setContent(new MatrixPane(size, tabSize-1));
                 tabPane.getTabs().add(tabSize-1, tmpTab);
             }
         });

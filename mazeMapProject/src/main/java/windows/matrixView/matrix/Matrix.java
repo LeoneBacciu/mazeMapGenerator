@@ -1,5 +1,8 @@
 package windows.matrixView.matrix;
 
+import windows.errors.FileCorruptedException;
+import windows.errors.MissingRampsException;
+import windows.errors.OpenMazeException;
 import windows.utils.JsonCell;
 import windows.utils.JsonType;
 
@@ -9,6 +12,7 @@ import java.util.List;
 
 public class Matrix {
     private final int size;
+    private final int level;
     private final Cell[][] matrix;
     private final int[][] pairs = new int[][]{
             {1, 0},
@@ -17,7 +21,8 @@ public class Matrix {
             {0, 1}
     };
 
-    public Matrix(int size){
+    public Matrix(int size, int level){
+        this.level = level;
         this.size = size;
         this.matrix = new Cell[size][size];
         for (int y = 0; y < size; y++) {
@@ -27,21 +32,26 @@ public class Matrix {
         }
     }
 
-    public Matrix(int size, int level, JsonType jsonType){
+    public Matrix(int size, int level, JsonType jsonType) throws FileCorruptedException {
+        this.level = level;
         this.size = size;
         this.matrix = new Cell[size][size];
 
-        for (JsonCell jsonCell: jsonType.body.get(level)) {
-            int x = jsonCell.coord[1], y = jsonCell.coord[0];
-            matrix[y][x] = new Cell(
-                    jsonCell.coord,
-                    jsonCell.walls,
-                    jsonCell.explored,
-                    jsonCell.black,
-                    jsonCell.checkpoint,
-                    jsonCell.victim,
-                    jsonCell.ramp
-            );
+        try{
+            for (JsonCell jsonCell : jsonType.body.get(level)) {
+                int x = jsonCell.coord[1], y = jsonCell.coord[0];
+                matrix[y][x] = new Cell(
+                        jsonCell.coord,
+                        jsonCell.walls,
+                        jsonCell.explored,
+                        jsonCell.black,
+                        jsonCell.checkpoint,
+                        jsonCell.victim,
+                        jsonCell.ramp
+                );
+            }
+        }catch (IndexOutOfBoundsException e){
+            throw new FileCorruptedException(e);
         }
 
         for (int y = 0; y < size; y++) {
@@ -66,34 +76,38 @@ public class Matrix {
         }
     }
 
-    private void fillMaskInside(boolean[][] mask){
+    private void fillMaskInside(boolean[][] mask) throws OpenMazeException {
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 if (matrix[y][x].getWalls()[0]==1){
                     try {
-                        fillMask(x, y, mask);
-                    }catch (ArrayIndexOutOfBoundsException ignored1){
-                        for (boolean[] m: mask) Arrays.fill(m, false);
                         try {
-                            fillMask(x+1, y, mask);
-                        }catch (ArrayIndexOutOfBoundsException ignored2){}
+                            fillMask(x, y, mask);
+                            return;
+                        }catch (ArrayIndexOutOfBoundsException ignored){
+                            for (boolean[] m: mask) Arrays.fill(m, false);
+                        }
+                        fillMask(x+1, y, mask);
+                        return;
+                    }catch (ArrayIndexOutOfBoundsException ignored){
+                            for (boolean[] m: mask) Arrays.fill(m, false);
                     }
                 }
             }
         }
-
+        throw new OpenMazeException();
     }
 
-    private int[] getRamp(){
+    private int[] getRamp() throws MissingRampsException {
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 if (!matrix[y][x].getRamp().equals("")) return new int[]{x, y};
             }
         }
-        return new int[]{0, 0};
+        throw new MissingRampsException(level);
     }
 
-    public List<Cell> toList(boolean first){
+    public List<Cell> toList(boolean first) throws OpenMazeException, MissingRampsException {
         List<Cell> cells = new ArrayList<>();
         boolean[][] mask = new boolean[size][size];
 

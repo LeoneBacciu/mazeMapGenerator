@@ -1,5 +1,7 @@
 package windows.matrixView.matrix;
 
+import org.omg.PortableServer.THREAD_POLICY_ID;
+
 import java.util.Arrays;
 
 public class Cell {
@@ -31,6 +33,7 @@ public class Cell {
         this.checkpoint = checkpoint;
         this.victim = victim;
         this.ramp = ramp;
+        if(!this.ramp.equals("")) Ramps.selected(this.ramp);
     }
 
     public String getStyle(){

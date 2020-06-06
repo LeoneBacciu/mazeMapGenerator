@@ -9,9 +9,9 @@ public class MatrixPane extends GridPane {
     private final MatrixCell[][] cells;
     private final int size;
 
-    public MatrixPane(int size){
+    public MatrixPane(int size, int level){
         this.size = size;
-        this.matrix = new Matrix(size);
+        this.matrix = new Matrix(size, level);
         this.cells = new MatrixCell[size][size];
         buildCells();
     }

@@ -3,16 +3,18 @@ package windows.utils;
 import com.google.gson.Gson;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
+import windows.errors.FileCorruptedException;
+import windows.errors.MissingRampsException;
+import windows.errors.OpenMazeException;
 import windows.matrixView.components.MatrixPane;
 import windows.matrixView.matrix.Cell;
 import windows.matrixView.matrix.Matrix;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -39,16 +41,52 @@ public class FileManager {
         if (selectedPath==null) return false;
         JsonType map = loadFromFile(selectedPath);
         loading = true;
-        tabPane.getTabs().remove(0, tabPane.getTabs().size()-1);
 
-        for (int i = 0; i < map.header[1]; i++) {
-            Tab tmpTab = new Tab();
-            tmpTab.setText("Level "+i);
-            tmpTab.setContent(new MatrixPane(size, new Matrix(size, i, map)));
-            tabPane.getTabs().add(i, tmpTab);
-            if (i==0) tmpTab.setClosable(false);
+        try {
+            MatrixPane[] matrixPanes = new MatrixPane[map.header[1]];
+            for (int i = 0; i < map.header[1]; i++) {
+                matrixPanes[i] = new MatrixPane(size, new Matrix(size, i, map));
+            }
+            tabPane.getTabs().remove(0, tabPane.getTabs().size()-1);
+            for (int i = 0; i < map.header[1]; i++) {
+                Tab tmpTab = new Tab();
+                tmpTab.setText("Level " + i);
+                tmpTab.setContent(matrixPanes[i]);
+                tabPane.getTabs().add(i, tmpTab);
+                if (i == 0) tmpTab.setClosable(false);
+            }
+            tabPane.getSelectionModel().select(0);
+        }catch (FileCorruptedException e){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("An error occurred while loading");
+            alert.setContentText(e.getMessage());
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.getCause().printStackTrace(pw);
+            String exceptionText = sw.toString();
+
+            Label label = new Label("The exception stacktrace was:");
+
+            TextArea textArea = new TextArea(exceptionText);
+            textArea.setEditable(false);
+            textArea.setWrapText(true);
+
+            textArea.setMaxWidth(Double.MAX_VALUE);
+            textArea.setMaxHeight(Double.MAX_VALUE);
+            GridPane.setVgrow(textArea, Priority.ALWAYS);
+            GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+            GridPane expContent = new GridPane();
+            expContent.setMaxWidth(Double.MAX_VALUE);
+            expContent.add(label, 0, 0);
+            expContent.add(textArea, 0, 1);
+
+            alert.getDialogPane().setExpandableContent(expContent);
+
+            alert.showAndWait();
         }
-        tabPane.getSelectionModel().select(0);
         loading = false;
         return true;
     }
@@ -65,16 +103,26 @@ public class FileManager {
 
         List<List<Cell>> matrices = new ArrayList<>();
         ObservableList<Tab> tabs = tabPane.getTabs();
-        for (int i = 0, tabsSize = tabs.size(); i < tabsSize-1; i++) {
-            Tab tab = tabs.get(i);
-            MatrixPane matrixPane = (MatrixPane) tab.getContent();
-            matrices.add(matrixPane.getMatrix().toList(i==0));
-        }
+        try {
+            for (int i = 0, tabsSize = tabs.size(); i < tabsSize-1; i++) {
+                Tab tab = tabs.get(i);
+                MatrixPane matrixPane = (MatrixPane) tab.getContent();
+                matrices.add(matrixPane.getMatrix().toList(i==0));
+            }
 
-        Map<String, Object> json = new HashMap<>();
-        json.put("header", new int[]{size, tabPane.getTabs().size()-1});
-        json.put("body", matrices);
-        this.saveToFile(selectedPath, json);
+            Map<String, Object> json = new HashMap<>();
+            json.put("header", new int[]{size, tabPane.getTabs().size()-1});
+            json.put("body", matrices);
+            this.saveToFile(selectedPath, json);
+        }catch (OpenMazeException | MissingRampsException e){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("An error occoured while saving");
+            alert.setContentText(e.getMessage());
+
+            alert.showAndWait();
+            return false;
+        }
         return true;
     }
 
