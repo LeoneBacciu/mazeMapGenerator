@@ -4,6 +4,7 @@ import windows.utils.JsonCell;
 import windows.utils.JsonType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Matrix {
@@ -65,6 +66,24 @@ public class Matrix {
         }
     }
 
+    private void fillMaskInside(boolean[][] mask){
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                if (matrix[y][x].getWalls()[0]==1){
+                    try {
+                        fillMask(x, y, mask);
+                    }catch (ArrayIndexOutOfBoundsException ignored1){
+                        for (boolean[] m: mask) Arrays.fill(m, false);
+                        try {
+                            fillMask(x+1, y, mask);
+                        }catch (ArrayIndexOutOfBoundsException ignored2){}
+                    }
+                }
+            }
+        }
+
+    }
+
     private int[] getRamp(){
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
@@ -79,7 +98,7 @@ public class Matrix {
         boolean[][] mask = new boolean[size][size];
 
         if(first) {
-            fillMask(0, 0, mask);
+            fillMaskInside(mask);
         } else {
             int[] ramp = getRamp();
             fillMask(ramp[0], ramp[1], mask);
