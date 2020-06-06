@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import windows.buttonView.ButtonView;
-import windows.matrixView.SavedState;
+import windows.utils.SavedState;
 import windows.matrixView.matrix.Cell;
 
 public class MatrixCell extends BorderPane {

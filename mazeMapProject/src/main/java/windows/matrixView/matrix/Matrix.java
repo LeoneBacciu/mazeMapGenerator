@@ -1,5 +1,8 @@
 package windows.matrixView.matrix;
 
+import windows.utils.JsonCell;
+import windows.utils.JsonType;
+
 import java.util.ArrayList;
 import java.util.List;
 

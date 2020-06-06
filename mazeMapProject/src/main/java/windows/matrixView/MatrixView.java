@@ -5,6 +5,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import windows.matrixView.components.MatrixPane;
 import windows.matrixView.components.TopBar;
+import windows.utils.FileManager;
 
 public class MatrixView extends BorderPane {
 
@@ -33,7 +34,7 @@ class AddTab extends Tab{
         tabPane.getTabs().add(this);
         tabPane.getSelectionModel().selectedIndexProperty().addListener((ov, oldValue, newValue) -> {
             int tabSize = tabPane.getTabs().size();
-            if(!topBar.isLoading() && newValue.intValue()==tabSize-1){
+            if(!FileManager.isLoading() && newValue.intValue()==tabSize-1){
                 tabPane.getSelectionModel().select(oldValue.intValue());
                 Tab tmpTab = new Tab();
                 tmpTab.setText("Level "+(tabSize-1));

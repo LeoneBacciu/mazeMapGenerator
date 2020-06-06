@@ -1,13 +1,6 @@
-package windows.matrixView.matrix;
+package windows.utils;
 
-import java.util.List;
-
-public class JsonType {
-    public int[] header;
-    public List<List<JsonCell>> body;
-}
-
-class JsonCell {
+public class JsonCell {
     public int[] coord;
     public int[] walls;
     public boolean explored;

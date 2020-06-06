@@ -7,7 +7,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import windows.matrixView.SavedState;
+import windows.utils.SavedState;
 import windows.matrixView.components.MatrixCell;
 import windows.matrixView.matrix.Cell;
 import windows.matrixView.matrix.Ramps;

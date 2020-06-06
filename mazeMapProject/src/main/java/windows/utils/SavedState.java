@@ -1,4 +1,4 @@
-package windows.matrixView;
+package windows.utils;
 
 public class SavedState {
     private static boolean saved = true;
