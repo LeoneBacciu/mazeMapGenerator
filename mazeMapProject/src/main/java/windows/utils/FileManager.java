@@ -107,7 +107,7 @@ public class FileManager {
             for (int i = 0, tabsSize = tabs.size(); i < tabsSize-1; i++) {
                 Tab tab = tabs.get(i);
                 MatrixPane matrixPane = (MatrixPane) tab.getContent();
-                matrices.add(matrixPane.getMatrix().toList(i==0));
+                matrices.add(matrixPane.getMatrix().toList());
             }
 
             Map<String, Object> json = new HashMap<>();

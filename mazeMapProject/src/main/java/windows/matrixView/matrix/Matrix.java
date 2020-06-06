@@ -67,12 +67,21 @@ public class Matrix {
     }
 
     private void fillMask(int x, int y, boolean[][] mask){
-        if(x<0 || x>mask.length || y<0 || y>mask.length || mask[y][x]) return;
+        if(mask[y][x]) return;
         mask[y][x] = true;
         for (int i = 0; i < 4; i++) {
             if(matrix[y][x].getWalls()[i]==0){
                 fillMask(x+pairs[i][1], y+pairs[i][0], mask);
             }
+        }
+    }
+
+    private void fillMaskRamp(boolean[][] mask) throws MissingRampsException, OpenMazeException {
+        int[] ramp = getRamp();
+        try {
+            fillMask(ramp[0], ramp[1], mask);
+        }catch (ArrayIndexOutOfBoundsException ignored){
+            throw new OpenMazeException(level);
         }
     }
 
@@ -95,7 +104,7 @@ public class Matrix {
                 }
             }
         }
-        throw new OpenMazeException();
+        throw new OpenMazeException(level);
     }
 
     private int[] getRamp() throws MissingRampsException {
@@ -107,15 +116,14 @@ public class Matrix {
         throw new MissingRampsException(level);
     }
 
-    public List<Cell> toList(boolean first) throws OpenMazeException, MissingRampsException {
+    public List<Cell> toList() throws OpenMazeException, MissingRampsException {
         List<Cell> cells = new ArrayList<>();
         boolean[][] mask = new boolean[size][size];
 
-        if(first) {
+        if(level==0) {
             fillMaskInside(mask);
         } else {
-            int[] ramp = getRamp();
-            fillMask(ramp[0], ramp[1], mask);
+            fillMaskRamp(mask);
         }
 
         for (int y = 0; y < size; y++) {
