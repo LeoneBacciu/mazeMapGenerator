@@ -1,6 +1,7 @@
 package windows.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -24,7 +25,7 @@ public class FileManager {
     private static int[] defaultStart = new int[]{0, 0, 0};
     private final TabPane tabPane;
     private final int size;
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final FileChooser fileChooser = new FileChooser();
 
     public FileManager(TabPane tabPane, int size){
@@ -134,6 +135,7 @@ public class FileManager {
             json.put("header", header);
             json.put("body", matrices);
             this.saveToFile(selectedPath, json);
+            SavedState.setSaved(true);
         }catch (OpenMazeException | MissingRampsException | MismatchingRampsException | StartCellException e){
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
