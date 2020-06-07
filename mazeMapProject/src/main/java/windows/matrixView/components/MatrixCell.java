@@ -67,7 +67,7 @@ public class MatrixCell extends BorderPane {
                 }
                 updateStyle();
             }
-        }else if (e.getEventType().equals(MouseEvent.MOUSE_CLICKED) && e.getButton() == MouseButton.SECONDARY){
+        } else if (e.getEventType().equals(MouseEvent.MOUSE_CLICKED) && e.getButton() == MouseButton.SECONDARY){
             List<String> ramps = Arrays.asList(Ramps.getAvailable(cell.getRamp(), matrixPane.getMatrix().getRamps()));
             int index = ramps.indexOf(cell.getRamp());
             Ramps.reverse(ramps.get(index));
@@ -77,6 +77,9 @@ public class MatrixCell extends BorderPane {
             cell.setRamp(ramps.get(index));
             Ramps.selected(cell.getRamp());
             matrixPane.getMatrix().getRamps().add(cell.getRamp());
+            updateStyle();
+        } else if(e.getEventType().equals(MouseEvent.MOUSE_CLICKED) && e.getButton() == MouseButton.MIDDLE){
+            cell.setVictim(!cell.hasVictim());
             updateStyle();
         }
         SavedState.setSaved(false);
