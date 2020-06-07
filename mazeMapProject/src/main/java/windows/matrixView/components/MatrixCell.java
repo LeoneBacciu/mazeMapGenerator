@@ -56,7 +56,6 @@ public class MatrixCell extends BorderPane {
                 if (System.currentTimeMillis() - clickStartTime > 300) {
                     cell.setVictim(!cell.hasVictim());
                 } else {
-                    System.out.println("Pressed for " + (System.currentTimeMillis() - clickStartTime) + " milliseconds");
                     if (cell.isBlack()){
                         cell.setBlack(false);
                         cell.setCheckpoint(true);

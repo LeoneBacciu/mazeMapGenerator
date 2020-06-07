@@ -1,16 +1,14 @@
 package windows.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
-import windows.errors.FileCorruptedException;
-import windows.errors.MismatchingRampsException;
-import windows.errors.MissingRampsException;
-import windows.errors.OpenMazeException;
+import windows.errors.*;
 import windows.matrixView.components.MatrixPane;
 import windows.matrixView.matrix.Cell;
 import windows.matrixView.matrix.Matrix;
@@ -19,13 +17,11 @@ import windows.matrixView.matrix.Ramps;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FileManager {
     private static boolean loading = false;
+    private static int[] defaultStart = new int[]{0, 0, 0};
     private final TabPane tabPane;
     private final int size;
     private final Gson gson = new Gson();
@@ -41,16 +37,17 @@ public class FileManager {
     public boolean load(Scene scene){
         File selectedPath = fileChooser.showOpenDialog(scene.getWindow());
         if (selectedPath==null) return false;
-        JsonType map = loadFromFile(selectedPath);
         loading = true;
 
         try {
-            MatrixPane[] matrixPanes = new MatrixPane[map.header[1]];
-            for (int i = 0; i < map.header[1]; i++) {
+            JsonType map = loadFromFile(selectedPath);
+            defaultStart = map.header.start;
+            MatrixPane[] matrixPanes = new MatrixPane[map.header.dims[1]];
+            for (int i = 0; i < map.header.dims[1]; i++) {
                 matrixPanes[i] = new MatrixPane(size, new Matrix(size, i, map));
             }
             tabPane.getTabs().remove(0, tabPane.getTabs().size()-1);
-            for (int i = 0; i < map.header[1]; i++) {
+            for (int i = 0; i < map.header.dims[1]; i++) {
                 Tab tmpTab = new Tab();
                 tmpTab.setText("Level " + i);
                 tmpTab.setContent(matrixPanes[i]);
@@ -94,6 +91,10 @@ public class FileManager {
     }
 
     public boolean save(Scene scene){
+
+        CenterChooserDialog centerChooserDialog = new CenterChooserDialog(tabPane.getTabs().size()-2, size, defaultStart);
+        if (!centerChooserDialog.launch()) return false;
+
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json");
         fileChooser.getExtensionFilters().add(extFilter);
@@ -103,6 +104,7 @@ public class FileManager {
         if(!selectedPath.getAbsolutePath().endsWith(".json"))
             selectedPath = new File(selectedPath.getAbsolutePath()+".json");
 
+        int[] startCell = centerChooserDialog.getCenterCell();
         List<List<Cell>> matrices = new ArrayList<>();
         ObservableList<Tab> tabs = tabPane.getTabs();
         try {
@@ -111,14 +113,28 @@ public class FileManager {
             for (int i = 0, tabsSize = tabs.size(); i < tabsSize-1; i++) {
                 Tab tab = tabs.get(i);
                 MatrixPane matrixPane = (MatrixPane) tab.getContent();
-                matrices.add(matrixPane.getMatrix().toList());
+                List<Cell> cells = matrixPane.getMatrix().toList();
+                if (startCell[0]==i){
+                    boolean startIn = false;
+                    for (Cell c: cells){
+                        if (c.getCoord()[0]==startCell[1] && c.getCoord()[1]==startCell[2]){
+                            startIn=true;
+                            break;
+                        }
+                    }
+                    if(!startIn) throw new StartCellException();
+                }
+                matrices.add(cells);
             }
 
             Map<String, Object> json = new HashMap<>();
-            json.put("header", new int[]{size, tabPane.getTabs().size()-1});
+            Map<String, Object> header = new HashMap<>();
+            header.put("dims", new int[]{size, tabPane.getTabs().size()-1});
+            header.put("start", startCell);
+            json.put("header", header);
             json.put("body", matrices);
             this.saveToFile(selectedPath, json);
-        }catch (OpenMazeException | MissingRampsException | MismatchingRampsException e){
+        }catch (OpenMazeException | MissingRampsException | MismatchingRampsException | StartCellException e){
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("An error occoured while saving");
@@ -139,18 +155,48 @@ public class FileManager {
         SavedState.setSaved(true);
     }
 
-    private JsonType loadFromFile(File path){
-        JsonType out = null;
+    private JsonType loadFromFile(File path) throws FileCorruptedException {
+        JsonType out;
         try{
             String data = new String(Files.readAllBytes(path.toPath()), StandardCharsets.UTF_8);
             out = gson.fromJson(data, JsonType.class);
-        } catch (IOException exception){
-            exception.printStackTrace();
+        } catch (IOException | JsonSyntaxException exception){
+            throw new FileCorruptedException(exception);
         }
         return out;
     }
 
     public static boolean isLoading() {
         return loading;
+    }
+}
+
+class CenterChooserDialog extends Alert {
+    private final Spinner<Integer>[] children = new Spinner[3];
+    private final String[] labels = new String[]{"Level: ", "X: ", "Y: "};
+
+    public CenterChooserDialog(int maxLevel, int maxSize, int[] defaultStart){
+        super(AlertType.CONFIRMATION);
+        setTitle("Starting point");
+        setHeaderText(null);
+        setContentText("Please, choose the starting point");
+        GridPane gridPane = new GridPane();
+        getDialogPane().setContent(gridPane);
+        for (int i = 0; i < 3; i++) {
+            gridPane.add(new Label(labels[i]), 0, i);
+            children[i] = new Spinner<>(0, (i==0)?maxLevel:maxSize, defaultStart[i], 1);
+            gridPane.add(children[i], 1, i);
+        }
+    }
+
+    public boolean launch(){
+        Optional<ButtonType> result = showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+    public int[] getCenterCell(){
+        int[] out = new int[3];
+        for (int i = 0; i < 3; i++) out[i] = children[i].getValue();
+        return out;
     }
 }
