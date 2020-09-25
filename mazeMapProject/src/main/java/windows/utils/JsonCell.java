@@ -5,6 +5,7 @@ public class JsonCell {
     public int[] walls;
     public boolean black;
     public boolean checkpoint;
-    public boolean victim;
+    public int[] victims;
+    public String bump;
     public String ramp;
 }

@@ -21,7 +21,7 @@ public class MatrixView extends BorderPane {
         }
 
         TopBar topBar = new TopBar(tabPane, size);
-        AddTab addTab = new AddTab(size[0], tabPane, topBar);
+        new AddTab(size[0], tabPane, topBar);
 
         setCenter(tabPane);
         setTop(topBar);

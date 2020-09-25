@@ -46,7 +46,8 @@ public class Matrix {
                         jsonCell.walls,
                         jsonCell.black,
                         jsonCell.checkpoint,
-                        jsonCell.victim,
+                        jsonCell.victims,
+                        jsonCell.bump,
                         jsonCell.ramp,
                         this.ramps
                 );

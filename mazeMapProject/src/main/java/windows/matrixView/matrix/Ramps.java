@@ -25,10 +25,6 @@ public class Ramps {
         return out;
     }
 
-    public static void Debug(){
-        System.out.println("Debug: " + Arrays.toString(ramps));
-    }
-
     public static void selected(String ramp){
         for (int i = 0; i < ramps.length; i++) {
             if(ramp.equals(rampNames[i])) {
